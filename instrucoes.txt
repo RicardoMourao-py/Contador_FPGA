@@ -1,0 +1,70 @@
+------------------------------------- SETUP -------------------------------------------------
+--- Zera os Displays de Sete Segmentos ---
+LDI $0       -Carrega o acumulador com o valor 0
+STA @288     -Armazena o valor do acumulador em HEX0
+STA @289     -Armazena o valor do acumulador em HEX1
+STA @290     -Armazena o valor do acumulador em HEX2
+STA @291     -Armazena o valor do acumulador em HEX3
+STA @292     -Armazena o valor do acumulador em HEX4
+STA @293     -Armazena o valor do acumulador em HEX4
+
+--- Apagando os LEDs ---
+LDI $0       -Carrega o acumulador com o valor 0
+STA @256     -Armazena o valor do bit0 do acumulador no LDR0 ~ LEDR7
+STA @257     -Armazena o valor do bit 0 do acumulador no LEDR8
+STA @258     -Armazena o valor do bit 0 do acumulador no LDR9
+
+--- Inicializando Variáveis ---
+LDI $0       -Carrega o acumulador com o valor 0
+STA @0       -Armazena o valor do acumulador em MEM[0]
+STA @10      -Armazena o valor do acumulador em MEM[10] (Unidades)
+STA @11      -Armazena o valor do acumulador em MEM[11] (Dezenas)
+STA @12      -Armazena o valor do acumulador em MEM[12] (Centenas)
+STA @13      -Armazena o valor do acumulador em MEM[13] (Unidades de Milhar)
+STA @14      -Armazena o valor do acumulador em MEM[14] (Centenas de Milhar)
+STA @15      -Armazena o valor do acumulador em MEM[15] (Unidade de Milhão)
+
+LDI $1       -Carrega o acumulador com o valor 1
+STA @1       -Armazena o valor do acumulador em MEM[1]
+
+LDI $9       -Carrega o acumulador com o valor 1
+STA @9       -Armazena o valor do acumulador em MEM[9]
+
+--------------------------------------  INICIO -----------------------------------------------
+
+---  Ler o botão de incremento de contagem (KEY0) ---
+LDA @352     -Carrega o acumulador com a leitura do botão KEY0
+CEQ @0       -Compara com valor armazenado em MEM[0] (Valor 0)
+JEQ @27      -Desvia para a linha 27 se igual a 0 (botao nao pressionado)
+JSR @29      -Desvia para a sub-rotina das unidades da linha 29
+NOP @0       -NOP
+JMP @23      -JMP @23
+
+--- Verifica as unidades
+STA @511     -Limpa KEY0
+LDA @10      -Carrega o acumulador com o valor de MEM[10] (unidades)
+
+CEQ @9       -Compara com valor armazenado em MEM[9] (Valor 9)
+JEQ @37      -Desvia para a linha 37 se igual a 0 (=9)
+
+SOMA @1      -Soma acumulador com valor da MEM[1] (1)
+STA @10      -Armazena o valor do acumulador em MEM[10] (unidades)
+STA @288     -Armazena o valor do acumulador em HEX0
+RET @0       -RET
+
+--- Verifica as Dezenas
+LDI $0       -Carrega o acumulador com o valor 0
+STA @10      -Armazena o valor do acumulador em MEM[10] (unidades)
+STA @288     -STA @288 Armazena o valor do acumulador em HEX0
+
+LDA @11      -Carrega o acumulador com o valor de MEM[11] (Dezenas)
+SOMA @1      -Soma acumulador com valor da MEM[1] (1)
+STA @11      -Armazena o valor do acumulador em MEM[11] (Dezenas)
+STA @289     -Armazena o valor do acumulador em HEX1
+JMP @23      -JMP @23
+
+---  Ler o botão de reiniciar contagem (FPGA_RESET) ---
+LDA @356     -Carrega o acumulador com a leitura do botão FPGA_RESET
+CEQ @0       -Compara com valor armazenado em MEM[0] (Valor 0)
+JEQ @23      -Desvia para a linha 23 se igual a 0 (botao nao pressionado)
+JMP @0       -Desvia para a sub-rotina das unidades da linha 29
